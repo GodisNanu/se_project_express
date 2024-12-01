@@ -25,7 +25,7 @@ const createUser = (req, res) => {
   User.create({ name, avatar })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
-      console.log(console.error);
+      console.error(err);
     });
 };
 
