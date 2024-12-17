@@ -11,3 +11,9 @@ app.use("/", mainRouter);
 app.listen(PORT, () => {
   console.log(`App listening at port ${PORT}`);
 });
+app.use((req, res, next) => {
+  req.user = {
+    _id: `6760b7449d0483d810c9dde9`,
+  };
+  next();
+});
