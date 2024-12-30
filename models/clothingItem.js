@@ -26,7 +26,7 @@ const clothingItemSchema = new mongoose.Schema({
     },
   },
 
-  /* owner: {
+  owner: {
     required: true,
     type: mongoose.ObjectId,
   },
@@ -34,7 +34,7 @@ const clothingItemSchema = new mongoose.Schema({
   likes: {
     ref: "user",
     type: mongoose.ObjectId,
-  }, */
+  },
 
   createdAt: {
     type: Date,

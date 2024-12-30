@@ -42,7 +42,36 @@ const deleteClothingItems = (req, res) => {
     });
 };
 
-module.exports = { createClothingItem, getClothingItems, deleteClothingItems };
-module.exports.createClothingItem = (req, res) => {
-  console.log(req.user._id);
+const putLikeItem = (req, res) => {
+  const { itemId } = req.params;
+  console.log("adding like");
+  ClothingItem.findByIdAndUpdate(
+    req.params.itemId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true }
+  )
+    .orFail()
+    .then((item) => res.status(201).send(item))
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ message: err.message });
+    });
 };
+
+const deleteLikeItem = (req, res) => {
+  const { itemId } = req.params;
+  console.log("removing like");
+  ClothingItem.findByIdAndUpdate(
+    req.params.itemId,
+    { $pull: { likes: req.usre._id } },
+    { new: true }
+  )
+    .orFail()
+    .then((item) => res.status(204).send(item))
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ messsage: err.messsage });
+    });
+};
+module.exports = { createClothingItem, getClothingItems, deleteClothingItems, putLikeItem, deleteLikeItem};
+
