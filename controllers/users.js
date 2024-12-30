@@ -14,12 +14,15 @@ const getUser = (req, res) => {
   console.log("getUser Controller");
   const { userid } = req.params;
   User.findById(userid)
+    .orFail()
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       console.error(err);
-      if (err.name === "DocumentNotFoundError") {
+      if (err.name === "ValidationError") {
+        return res.status(400).send({ message: err.message });
+      } else if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
-      } else if (err.name === "CastErro") {
+      } else if (err.name === "CastError") {
         return res.status(401).send({ message: err.message });
       }
       return res.status(500).send({ message: err.message });

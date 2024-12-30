@@ -3,7 +3,8 @@ const ClothingItem = require("../models/clothingItem");
 const createClothingItem = (req, res) => {
   console.log("creating Clothing Item");
   const { name, weather, imageUrl } = req.body;
-  ClothingItem.create({ name, weather, imageUrl }).then((item) => {
+  const owner = req.user._id;
+  ClothingItem.create({ name, weather, imageUrl, owner }).then((item) => {
     res
       .status(201)
       .send({ data: item })
@@ -73,5 +74,10 @@ const deleteLikeItem = (req, res) => {
       return res.status(500).send({ messsage: err.messsage });
     });
 };
-module.exports = { createClothingItem, getClothingItems, deleteClothingItems, putLikeItem, deleteLikeItem};
-
+module.exports = {
+  createClothingItem,
+  getClothingItems,
+  deleteClothingItems,
+  putLikeItem,
+  deleteLikeItem,
+};
