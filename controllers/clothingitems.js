@@ -4,18 +4,15 @@ const createClothingItem = (req, res) => {
   console.log("creating Clothing Item");
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
-  ClothingItem.create({ name, weather, imageUrl, owner }).then((item) => {
-    res
-      .status(201)
-      .send({ data: item })
-      .catch((err) => {
-        console.error(err);
-        if (err.name === "ValidationError") {
-          return res.status(400).send({ message: err.message });
-        }
-        return res.status(500).send({ message: err.message });
-      });
-  });
+  ClothingItem.create({ name, weather, imageUrl, owner })
+    .then((item) => res.status(201).send({ data: item }))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError") {
+        return res.status(400).send({ message: err.message });
+      }
+      return res.status(500).send({ message: err.message });
+    });
 };
 
 const getClothingItems = (req, res) => {
@@ -54,6 +51,12 @@ const putLikeItem = (req, res) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       console.error(err);
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: err.message });
+      }
+      if (err.name === "DocuemntNotFoundError") {
+        return res.status(404).send({ message: err.message });
+      }
       return res.status(500).send({ message: err.message });
     });
 };
@@ -66,9 +69,15 @@ const deleteLikeItem = (req, res) => {
     { new: true }
   )
     .orFail()
-    .then((item) => res.status(204).send(item))
+    .then((item) => res.status(200).send(item))
     .catch((err) => {
       console.error(err);
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: err.message });
+      }
+      if (err.name === "DocuemntNotFoundError") {
+        return res.status(404).send({ message: err.message });
+      }
       return res.status(500).send({ messsage: err.messsage });
     });
 };
