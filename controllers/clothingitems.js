@@ -30,9 +30,12 @@ const deleteClothingItems = (req, res) => {
   console.log("deleting Clothing Items");
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => res.status(204).send(item))
+    .then((item) => res.status(200).send(item))
     .catch((err) => {
       console.error(err);
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: err.message });
+      }
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
       }
@@ -54,7 +57,7 @@ const putLikeItem = (req, res) => {
       if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
       }
-      if (err.name === "DocuemntNotFoundError") {
+      if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
       }
       return res.status(500).send({ message: err.message });
@@ -65,7 +68,7 @@ const deleteLikeItem = (req, res) => {
   console.log("removing like");
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
-    { $pull: { likes: req.usre._id } },
+    { $pull: { likes: req.user._id } },
     { new: true }
   )
     .orFail()
@@ -75,7 +78,7 @@ const deleteLikeItem = (req, res) => {
       if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
       }
-      if (err.name === "DocuemntNotFoundError") {
+      if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
       }
       return res.status(500).send({ messsage: err.messsage });

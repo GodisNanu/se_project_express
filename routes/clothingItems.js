@@ -11,6 +11,6 @@ router.get("/", getClothingItems);
 router.post("/", createClothingItem);
 router.delete("/:itemId", deleteClothingItems);
 router.put("/:itemId/likes", putLikeItem);
-router.delete("/:itmeId/likes", deleteLikeItem);
+router.delete("/:itemId/likes", deleteLikeItem);
 
 module.exports = router;
