@@ -7,7 +7,7 @@ const clothingItemRouter = require("./clothingItems");
 router.use("/users", userRouter);
 router.use("/items", clothingItemRouter);
 router.use((req, res) => {
-  return res.status(NOT_FOUND).send({ message: "Page not found" });
+  res.status(NOT_FOUND).send({ message: "Page not found" });
 });
 
 module.exports = router;
