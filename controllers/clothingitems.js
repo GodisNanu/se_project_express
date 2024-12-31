@@ -44,7 +44,6 @@ const deleteClothingItems = (req, res) => {
 };
 
 const putLikeItem = (req, res) => {
-  const { itemId } = req.params;
   console.log("adding like");
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
@@ -60,7 +59,6 @@ const putLikeItem = (req, res) => {
 };
 
 const deleteLikeItem = (req, res) => {
-  const { itemId } = req.params;
   console.log("removing like");
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
