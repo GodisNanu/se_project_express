@@ -38,9 +38,9 @@ const getUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, avatar } = req.body;
+  const { name, avatar, email, password } = req.body;
   console.log("createUser Controler ", name, avatar);
-  User.create({ name, avatar })
+  User.create({ name, avatar, email, password })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       console.error(err);
@@ -54,5 +54,8 @@ const createUser = (req, res) => {
         .send({ message: "An error has occured on the server" });
     });
 };
+
+// make sure email is unique and a correct error message is thrown//
+//make sure passwords are hashed before being saved//
 
 module.exports = { getUsers, getUser, createUser };
