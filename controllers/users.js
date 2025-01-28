@@ -1,5 +1,10 @@
 const User = require("../models/user");
-const { BAD_REQUEST, NOT_FOUND, DEFAULT } = require("../utils/errors");
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  DEFAULT,
+  CONFLICT,
+} = require("../utils/errors");
 
 const getUsers = (req, res) => {
   console.log("getUsers Controller");
@@ -48,6 +53,9 @@ const createUser = (req, res) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid data provided" });
+      }
+      if (err.name === "DuplicateKeyError") {
+        return res.status(CONFLICT).send({ message: "User Already Exists" });
       }
       return res
         .status(DEFAULT)
