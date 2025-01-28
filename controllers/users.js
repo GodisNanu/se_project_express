@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const bcrypt = require("bcryptjs");
 const {
   BAD_REQUEST,
   NOT_FOUND,
@@ -61,9 +62,24 @@ const createUser = (req, res) => {
         .status(DEFAULT)
         .send({ message: "An error has occured on the server" });
     });
-};
 
-// make sure email is unique and a correct error message is thrown//
-//make sure passwords are hashed before being saved//
+  bcrypt
+    .hash(req.body.password, 10)
+    .then((hash) =>
+      User.create({
+        email: req.body.email,
+        password: hash,
+      })
+    )
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        res.status(BAD_REQUEST).send({ message: "Invalid data provided" });
+      }
+      return res
+        .status(DEFAULT)
+        .send({ message: "An error has occured on the server" });
+    });
+};
 
 module.exports = { getUsers, getUser, createUser };
