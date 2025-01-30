@@ -81,6 +81,24 @@ const createUser = (req, res) => {
         .status(DEFAULT)
         .send({ message: "An error has occured on the server" });
     });
+
+  //create login controller that gets email and password then authenticates them
+  userSchema.statics.findUserByCredentials = function findUserByCredentials(
+    email,
+    password
+  ) {
+    return this.fidnOne({ email }).then((user) => {
+      if (!user) {
+        return Promise.reject(new Error("Incorrect email or password"));
+      }
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          return Promise.reject(new Error("Incorrect email orpassword"));
+        }
+        return user;
+      });
+    });
+  };
 };
 
 module.exports = { getUsers, getUser, createUser };
