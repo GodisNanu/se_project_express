@@ -83,25 +83,25 @@ const createUser = (req, res) => {
         .status(DEFAULT)
         .send({ message: "An error has occured on the server" });
     });
-
-  module.exports.login = (req, res) => {
-    const { email, password } = req.body;
-
-    return User.findUserByCredentials(email, password)
-      .then((user) => {
-        const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-          expiresIn: "7d",
-        });
-        return res.send(token);
-      })
-      .catch((err) => {
-        if (err.name === "UnauthorizedError") {
-          return res
-            .status(UNAUTHORIZED)
-            .send({ message: "Incorrect email and password" });
-        }
-      });
-  };
 };
 
-module.exports = { getUsers, getUser, createUser };
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      return res.send(token);
+    })
+    .catch((err) => {
+      if (err.name === "UnauthorizedError") {
+        return res
+          .status(UNAUTHORIZED)
+          .send({ message: "Incorrect email and password" });
+      }
+    });
+};
+
+module.exports = { getUsers, getUser, createUser, login };
