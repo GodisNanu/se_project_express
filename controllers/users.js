@@ -1,11 +1,13 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
+const JWT_SECRET = require("../utils/config");
 
 const {
   BAD_REQUEST,
   NOT_FOUND,
   DEFAULT,
   CONFLICT,
+  UNAUTHORIZED,
 } = require("../utils/errors");
 
 const getUsers = (req, res) => {
@@ -83,21 +85,24 @@ const createUser = (req, res) => {
     });
 
   //create login controller that gets email and password then authenticates them
-  userSchema.statics.findUserByCredentials = function findUserByCredentials(
-    email,
-    password
-  ) {
-    return this.fidnOne({ email }).then((user) => {
-      if (!user) {
-        return Promise.reject(new Error("Incorrect email or password"));
-      }
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          return Promise.reject(new Error("Incorrect email orpassword"));
+
+  module.exports.login = (req, res) => {
+    const { email, password } = req.body;
+
+    return User.findUserByCredentials(email, password)
+      .then((user) => {
+        const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+          expiresIn: "7d",
+        });
+        return res.send(token);
+      })
+      .catch((err) => {
+        if (err.name === "UnauthorizedError") {
+          return res
+            .status(UNAUTHORIZED)
+            .send({ message: "Incorrect email and password" });
         }
-        return user;
       });
-    });
   };
 };
 
