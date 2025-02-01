@@ -23,9 +23,9 @@ const getUsers = (req, res) => {
     });
 };
 
-const getUser = (req, res) => {
+const getCurrentUser = (req, res) => {
   console.log("getUser Controller");
-  const { userid } = req.params;
+  const { userid } = req.user;
   User.findById(userid)
     .orFail()
     .then((user) => res.status(200).send(user))
@@ -105,4 +105,29 @@ const login = (req, res) => {
     });
 };
 
-module.exports = { getUsers, getUser, createUser, login };
+const updateProfile = (req, res) => {
+  const { name, avatar } = req.body;
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
+    .then((user) => res.status(200).res.send(user))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid data provided" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Id provided was not found" });
+      }
+      return res
+        .status(DEFAULT)
+        .send({ message: "An error has occured on the server" });
+    });
+};
+
+module.exports = { getUsers, getCurrentUser, createUser, login, updateProfile };
