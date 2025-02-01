@@ -84,8 +84,6 @@ const createUser = (req, res) => {
         .send({ message: "An error has occured on the server" });
     });
 
-  //create login controller that gets email and password then authenticates them
-
   module.exports.login = (req, res) => {
     const { email, password } = req.body;
 
