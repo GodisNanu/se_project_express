@@ -77,6 +77,7 @@ const createUser = (req, res) => {
     )
     .then((user) => res.send(user))
     .catch((err) => {
+      console.error(err);
       if (err.name === "ValidationError") {
         res.status(BAD_REQUEST).send({ message: "Invalid data provided" });
       }
@@ -88,7 +89,7 @@ const createUser = (req, res) => {
 
 const login = (req, res) => {
   const { email, password } = req.body;
-
+  console.log("login controller", email, password);
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -98,6 +99,7 @@ const login = (req, res) => {
       return res.status(200).send({ token });
     })
     .catch((err) => {
+      console.error(err);
       if (err.name === "UnauthorizedError") {
         return res
           .status(UNAUTHORIZED)
@@ -111,6 +113,7 @@ const login = (req, res) => {
 
 const updateProfile = (req, res) => {
   const { name, avatar } = req.body;
+  console.log("updateProfile controller", name, avatar);
   User.findByIdAndUpdate(
     req.user._id,
     { name, avatar },
@@ -118,6 +121,7 @@ const updateProfile = (req, res) => {
   )
     .then((user) => res.status(200).res.send(user))
     .catch((err) => {
+      console.error(err);
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST)

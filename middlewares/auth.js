@@ -13,11 +13,15 @@ module.exports = (req, res, next) => {
   let payload;
   try {
     payload = jwt.verify(token, JWT_SECRET);
+    if (!payload || !payload._id) {
+      return res
+        .status(UNAUTHORIZED)
+        .send({ message: "Missing or invalid authorization" });
+    }
     req.user = payload;
-    next();
+    return next();
   } catch (err) {
-    return res
-      .status(UNAUTHORIZED)
-      .send({ message: "Missing or invalid authorization" });
+    console.error(err);
+    return res.status(UNAUTHORIZED).send({ message: "Authentication failed" });
   }
 };
