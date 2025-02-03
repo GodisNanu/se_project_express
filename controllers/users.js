@@ -51,10 +51,8 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   console.log("createUser Controler ", name, avatar);
   bcrypt
-    .hash(req.body.password, 10)
-    .then((hash) =>
-      User.create({ name, avatar, email: req.body.email, password: hash })
-    )
+    .hash(password, 10)
+    .then((hash) => User.create({ name, avatar, email, password: hash }))
     .then((user) => {
       User.findById(user._id)
         .select("-password")

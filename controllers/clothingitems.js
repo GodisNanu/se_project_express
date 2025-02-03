@@ -1,5 +1,10 @@
 const ClothingItem = require("../models/clothingItem");
-const { BAD_REQUEST, NOT_FOUND, DEFAULT } = require("../utils/errors");
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  DEFAULT,
+  FORBIDDEN,
+} = require("../utils/errors");
 
 const createClothingItem = (req, res) => {
   console.log("creating Clothing Item");
@@ -45,7 +50,7 @@ const deleteClothingItems = (req, res) => {
       }
       return ClothingItem.findByIdAndDelete(itemId)
         .orFail()
-        .then((item) => res.status(200).send(item))
+        .then((deletedItem) => res.status(200).send(deletedItem))
         .catch((err) => {
           console.error(err);
           if (err.name === "CastError") {
