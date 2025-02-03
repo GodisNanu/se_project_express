@@ -50,8 +50,19 @@ const getCurrentUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   console.log("createUser Controler ", name, avatar);
-  User.create({ name, avatar, email, password })
-    .then((user) => res.status(201).send(user))
+  bcrypt
+    .hash(req.body.password, 10)
+    .then((hash) =>
+      User.create({ name, avatar, email: req.body.email, password: hash })
+    )
+    .then((user) => {
+      User.findById(user._id)
+        .select("-password")
+        .then((userWithoutPassword) => {
+          res.status(201).send(userWithoutPassword);
+        });
+    })
+
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
@@ -61,25 +72,6 @@ const createUser = (req, res) => {
       }
       if (err.name === "DuplicateKeyError") {
         return res.status(CONFLICT).send({ message: "User Already Exists" });
-      }
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occured on the server" });
-    });
-
-  bcrypt
-    .hash(req.body.password, 10)
-    .then((hash) =>
-      User.create({
-        email: req.body.email,
-        password: hash,
-      })
-    )
-    .then((user) => res.send(user))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "ValidationError") {
-        res.status(BAD_REQUEST).send({ message: "Invalid data provided" });
       }
       return res
         .status(DEFAULT)
