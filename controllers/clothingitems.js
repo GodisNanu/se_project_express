@@ -26,25 +26,42 @@ const getClothingItems = (req, res) => {
     .then((items) => res.status(200).send(items))
     .catch((err) => {
       console.error(err);
-      return res.status(DEFAULT).send({ message: "An error has occured on the server" });
+      return res
+        .status(DEFAULT)
+        .send({ message: "An error has occured on the server" });
     });
 };
 
 const deleteClothingItems = (req, res) => {
   const { itemId } = req.params;
   console.log("deleting Clothing Items");
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
-    .then((item) => res.status(200).send(item))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid data provided" });
+    .then((item) => {
+      if (item.owner.toString() !== req.user._id.toString()) {
+        return res
+          .status(FORBIDDEN)
+          .SEND({ message: "You are not authorized to delete this item" });
       }
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: "Id provided was not found" });
-      }
-      return res.status(DEFAULT).send({ message: "An error has occured on the server" });
+      return ClothingItem.findByIdAndDelete(itemId)
+        .orFail()
+        .then((item) => res.status(200).send(item))
+        .catch((err) => {
+          console.error(err);
+          if (err.name === "CastError") {
+            return res
+              .status(BAD_REQUEST)
+              .send({ message: "Invalid data provided" });
+          }
+          if (err.name === "DocumentNotFoundError") {
+            return res
+              .status(NOT_FOUND)
+              .send({ message: "Id provided was not found" });
+          }
+          return res
+            .status(DEFAULT)
+            .send({ message: "An error has occured on the server" });
+        });
     });
 };
 
@@ -60,10 +77,14 @@ const putLikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid data provided" });
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid data provided" });
       }
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: "Id provided was not found" });
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Id provided was not found" });
       }
       return res
         .status(DEFAULT)
@@ -83,14 +104,21 @@ const deleteLikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid data provided" });
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid data provided" });
       }
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: "Id provided was not found" });
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Id provided was not found" });
       }
-      return res.status(DEFAULT).send({ messsage: "An error has occured on the server" });
+      return res
+        .status(DEFAULT)
+        .send({ messsage: "An error has occured on the server" });
     });
 };
+
 module.exports = {
   createClothingItem,
   getClothingItems,
