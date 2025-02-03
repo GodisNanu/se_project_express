@@ -50,6 +50,10 @@ const getCurrentUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   console.log("createUser Controler ", name, avatar);
+  const existingUser = User.findOne({ email });
+  if (existingUser) {
+    return res.status(CONFLICT).send({ message: "User Already Exists" });
+  }
   bcrypt
     .hash(password, 10)
     .then((hash) => User.create({ name, avatar, email, password: hash }))
@@ -67,9 +71,6 @@ const createUser = (req, res) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid data provided" });
-      }
-      if (err.name === "DuplicateKeyError") {
-        return res.status(CONFLICT).send({ message: "User Already Exists" });
       }
       return res
         .status(DEFAULT)
@@ -90,6 +91,11 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
+      if (err.name === "ValidationError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid data provided" });
+      }
       if (err.name === "UnauthorizedError") {
         return res
           .status(UNAUTHORIZED)
