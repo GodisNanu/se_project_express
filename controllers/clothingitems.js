@@ -48,7 +48,7 @@ const deleteClothingItems = (req, res) => {
       .send({ message: "Authentication required" });
   }
 
-  ClothingItem.findById(itemId)
+  return ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
       if (item.owner.toString() !== req.user._id.toString()) {
