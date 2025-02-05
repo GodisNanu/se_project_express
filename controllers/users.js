@@ -89,7 +89,7 @@ const login = (req, res) => {
   console.log("login controller", email, password);
 
   if (!email || !password) {
-    throw new BAD_REQUEST("Invalid data provided");
+    return res.status(BAD_REQUEST).send({ message: "Invalid data provided" });
   }
 
   return User.findUserByCredentials(email, password)
