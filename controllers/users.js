@@ -10,6 +10,7 @@ const {
   CONFLICT,
   UNAUTHORIZED,
 } = require("../utils/errors");
+const { restart } = require("nodemon");
 
 const getUsers = (req, res) => {
   console.log("getUsers Controller");
@@ -50,6 +51,9 @@ const getCurrentUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   console.log("createUser Controler ", name, avatar);
+  if (!email || !password || !name || !avatar) {
+    return res.status(BAD_REQUEST).send({ message: "Invalid data provided" });
+  }
   return User.findOne({ email })
     .then((existingUser) => {
       if (existingUser) {
@@ -61,9 +65,9 @@ const createUser = (req, res) => {
         .then((user) => {
           User.findById(user._id)
             .select("-password")
-            .then((userWithoutPassword) => {
-              return res.status(201).send(userWithoutPassword);
-            });
+            .then((userWithoutPassword) =>
+              res.status(201).send(userWithoutPassword)
+            );
         });
     })
 
@@ -83,8 +87,16 @@ const createUser = (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
   console.log("login controller", email, password);
+  if (!email || !password) {
+    return res.status(BAD_REQUEST).send({ message: "Invalid data provided" });
+  }
   return User.findUserByCredentials(email, password)
     .then((user) => {
+      if (!user) {
+        return res
+          .status(UNAUTHORIZED)
+          .send({ message: "User does not exist" });
+      }
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
