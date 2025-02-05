@@ -10,7 +10,6 @@ const {
   CONFLICT,
   UNAUTHORIZED,
 } = require("../utils/errors");
-const { restart } = require("nodemon");
 
 const getUsers = (req, res) => {
   console.log("getUsers Controller");
@@ -86,10 +85,13 @@ const createUser = (req, res) => {
 
 const login = (req, res) => {
   const { email, password } = req.body;
+
   console.log("login controller", email, password);
+
   if (!email || !password) {
     return res.status(BAD_REQUEST).send({ message: "Invalid data provided" });
   }
+
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
@@ -114,6 +116,11 @@ const login = (req, res) => {
         return res
           .status(UNAUTHORIZED)
           .send({ message: "Incorrect email and password" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Id provided was not found" });
       }
       return res
         .status(DEFAULT)
