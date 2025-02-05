@@ -51,7 +51,7 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   console.log("createUser Controler ", name, avatar);
   if (!email || !password || !name || !avatar) {
-    throw new BAD_REQUEST("Missing data");
+    return res.status(BAD_REQUEST).send({ message: "Missing data" });
   }
   return User.findOne({ email })
     .then((existingUser) => {
@@ -95,7 +95,9 @@ const login = (req, res) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        throw new UNAUTHORIZED("User does not exist");
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid data provided" });
       }
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
