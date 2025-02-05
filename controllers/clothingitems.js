@@ -4,6 +4,7 @@ const {
   NOT_FOUND,
   DEFAULT,
   FORBIDDEN,
+  UNAUTHORIZED,
 } = require("../utils/errors");
 
 const createClothingItem = (req, res) => {
@@ -40,6 +41,13 @@ const getClothingItems = (req, res) => {
 const deleteClothingItems = (req, res) => {
   const { itemId } = req.params;
   console.log("deleting Clothing Items");
+
+  if (!req.user) {
+    return res
+      .status(UNAUTHORIZED)
+      .send({ message: "Authentication required" });
+  }
+
   ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
@@ -48,30 +56,27 @@ const deleteClothingItems = (req, res) => {
           .status(FORBIDDEN)
           .send({ message: "You are not authorized to delete this item" });
       }
-      return ClothingItem.findByIdAndDelete(itemId)
-        .orFail()
-        .then((deletedItem) => res.status(200).send(deletedItem))
-        .catch((err) => {
-          console.error(err);
-          if (err.name === "ForbiddenError") {
-            return res
-              .status(FORBIDDEN)
-              .send({ message: "User not authorized" });
-          }
-          if (err.name === "CastError") {
-            return res
-              .status(BAD_REQUEST)
-              .send({ message: "Invalid data provided" });
-          }
-          if (err.name === "DocumentNotFoundError") {
-            return res
-              .status(NOT_FOUND)
-              .send({ message: "Id provided was not found" });
-          }
-          return res
-            .status(DEFAULT)
-            .send({ message: "An error has occured on the server" });
-        });
+      return ClothingItem.findByIdAndDelete(itemId);
+    })
+    .then((deletedItem) => res.status(200).send(deletedItem))
+    .catch((err) => {
+      console.error("Item deletion error", err);
+      if (err.name === "ForbiddenError") {
+        return res.status(FORBIDDEN).send({ message: "User not authorized" });
+      }
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid data provided" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Id provided was not found" });
+      }
+      return res
+        .status(DEFAULT)
+        .send({ message: "An error has occured on the server" });
     });
 };
 
