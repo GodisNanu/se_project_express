@@ -10,6 +10,7 @@ const {
   CONFLICT,
   UNAUTHORIZED,
 } = require("../utils/errors");
+const user = require("../models/user");
 
 const getUsers = (req, res) => {
   console.log("getUsers Controller");
@@ -24,11 +25,13 @@ const getUsers = (req, res) => {
 };
 
 const getCurrentUser = (req, res) => {
-  console.log("getUser Controller");
-  const { userid } = req.user;
-  User.findById(userid)
+  console.log("getCurrentUser Controller");
+
+  User.findById(req.user._id)
     .orFail()
-    .then((user) => res.status(200).send(user))
+    .then((user) => {
+      return res.status(200).send(user);
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
@@ -136,7 +139,9 @@ const updateProfile = (req, res) => {
     { name, avatar },
     { new: true, runValidators: true }
   )
-    .then((user) => res.status(200).res.send(user))
+    .then((user) => {
+      return res.status(200).send(user);
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
