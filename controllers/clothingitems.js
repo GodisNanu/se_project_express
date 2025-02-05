@@ -44,15 +44,18 @@ const deleteClothingItems = (req, res) => {
     .orFail()
     .then((item) => {
       if (item.owner.toString() !== req.user._id.toString()) {
-        return res
-          .status(FORBIDDEN)
-          .SEND({ message: "You are not authorized to delete this item" });
+        throw new FORBIDDEN("You are not authorized to delete this item");
       }
       return ClothingItem.findByIdAndDelete(itemId)
         .orFail()
         .then((deletedItem) => res.status(200).send(deletedItem))
         .catch((err) => {
           console.error(err);
+          if (err.name === "ForbiddenError") {
+            return res
+              .status(FORBIDDEN)
+              .send({ message: "User not authorized" });
+          }
           if (err.name === "CastError") {
             return res
               .status(BAD_REQUEST)
