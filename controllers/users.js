@@ -50,18 +50,20 @@ const getCurrentUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   console.log("createUser Controler ", name, avatar);
-  const existingUser = User.findOne({ email });
-  if (existingUser) {
-    return res.status(CONFLICT).send({ message: "User Already Exists" });
-  }
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => User.create({ name, avatar, email, password: hash }))
-    .then((user) => {
-      User.findById(user._id)
-        .select("-password")
-        .then((userWithoutPassword) => {
-          res.status(201).send(userWithoutPassword);
+  return User.findOne({ email })
+    .then((existingUser) => {
+      if (existingUser) {
+        return res.status(CONFLICT).send({ message: "User Already Exists" });
+      }
+      return bcrypt
+        .hash(password, 10)
+        .then((hash) => User.create({ name, avatar, email, password: hash }))
+        .then((user) => {
+          User.findById(user._id)
+            .select("-password")
+            .then((userWithoutPassword) => {
+              return res.status(201).send(userWithoutPassword);
+            });
         });
     })
 
