@@ -56,9 +56,10 @@ const deleteClothingItems = (req, res) => {
           .status(FORBIDDEN)
           .send({ message: "You are not authorized to delete this item" });
       }
-      return ClothingItem.findByIdAndDelete(itemId);
+      return ClothingItem.findByIdAndDelete(itemId).then((deletedItem) =>
+        res.status(200).send(deletedItem)
+      );
     })
-    .then((deletedItem) => res.status(200).send(deletedItem))
     .catch((err) => {
       console.error("Item deletion error", err);
       if (err.name === "ForbiddenError") {

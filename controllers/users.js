@@ -11,18 +11,6 @@ const {
   UNAUTHORIZED,
 } = require("../utils/errors");
 
-const getUsers = (req, res) => {
-  console.log("getUsers Controller");
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occured on the server" });
-    });
-};
-
 const getCurrentUser = (req, res) => {
   console.log("getCurrentUser Controller");
 
@@ -116,11 +104,6 @@ const login = (req, res) => {
         return res
           .status(UNAUTHORIZED)
           .send({ message: "Incorrect email and password" });
-      }
-      if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Id provided was not found" });
       }
       return res
         .status(DEFAULT)

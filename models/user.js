@@ -33,7 +33,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8,
     select: false,
   },
 });
@@ -46,7 +45,7 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(
     .select("+password")
     .then((user) => {
       const error = new Error("Incorrect email or password");
-      error.name = "ValidationError";
+      error.name = "UnauthorizedError";
       if (!user) {
         throw error;
       }
