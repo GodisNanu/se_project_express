@@ -138,4 +138,4 @@ const updateProfile = (req, res) => {
     });
 };
 
-module.exports = { getUsers, getCurrentUser, createUser, login, updateProfile };
+module.exports = { getCurrentUser, createUser, login, updateProfile };
