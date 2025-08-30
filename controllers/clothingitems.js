@@ -1,11 +1,9 @@
 const ClothingItem = require("../models/clothingItem");
-const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  DEFAULT,
-  FORBIDDEN,
-  UNAUTHORIZED,
-} = require("../utils/errors");
+const BadRequestError = require("../errors/bad-request-err");
+const DefaultError = require("../errors/default-err");
+const UnauthorizedError = require("../errors/unauthorized-err");
+const ForbiddenError = require("../errors/forbidden-err");
+const NotFoundError = require("../errors/not-found-err");
 
 const createClothingItem = (req, res) => {
   console.log("creating Clothing Item");
@@ -16,13 +14,10 @@ const createClothingItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid data provided" });
+        next(new BadRequestError("Invalid data provided"));
+      } else {
+        next(err);
       }
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occured on the server" });
     });
 };
 
@@ -30,12 +25,7 @@ const getClothingItems = (req, res) => {
   console.log("getting clothing items");
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occured on the server" });
-    });
+    .catch((err) => next(new DefaultError("An error occurred on the server")));
 };
 
 const deleteClothingItems = (req, res) => {
@@ -43,18 +33,14 @@ const deleteClothingItems = (req, res) => {
   console.log("deleting Clothing Items");
 
   if (!req.user) {
-    return res
-      .status(UNAUTHORIZED)
-      .send({ message: "Authentication required" });
+    next(new UnauthorizedError("Authentication Required"));
   }
 
   return ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
       if (item.owner.toString() !== req.user._id.toString()) {
-        return res
-          .status(FORBIDDEN)
-          .send({ message: "You are not authorized to delete this item" });
+        next(new ForbiddenError("You are not authorized to delete this item"));
       }
       return ClothingItem.findByIdAndDelete(itemId).then((deletedItem) =>
         res.status(200).send(deletedItem)
@@ -63,21 +49,16 @@ const deleteClothingItems = (req, res) => {
     .catch((err) => {
       console.error("Item deletion error", err);
       if (err.name === "ForbiddenError") {
-        return res.status(FORBIDDEN).send({ message: "User not authorized" });
+        next(new ForbiddenError("User not authorized"));
       }
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid data provided" });
+        next(new BadRequestError("Invalid data provided"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Id provided was not found" });
+        next(new NotFoundError("Id provided was not found"));
+      } else {
+        next(err);
       }
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occured on the server" });
     });
 };
 
@@ -91,20 +72,14 @@ const putLikeItem = (req, res) => {
     .orFail()
     .then((item) => res.status(201).send(item))
     .catch((err) => {
-      console.error(err);
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid data provided" });
+        next(new BadRequestError("Invalid data provided"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Id provided was not found" });
+        next(new NotFoundError("Id provided was not found"));
+      } else {
+        next(err);
       }
-      return res
-        .status(DEFAULT)
-        .send({ message: "An error has occured on the server" });
     });
 };
 
@@ -120,18 +95,13 @@ const deleteLikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid data provided" });
+        next(new BadRequestError("Invalid data provided"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Id provided was not found" });
+        next(new NotFoundError("Id provided was not found"));
+      } else {
+        next(err);
       }
-      return res
-        .status(DEFAULT)
-        .send({ messsage: "An error has occured on the server" });
     });
 };
 
