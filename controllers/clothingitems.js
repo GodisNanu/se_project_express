@@ -20,11 +20,14 @@ const createClothingItem = (req, res, next) => {
     });
 };
 
-const getClothingItems = (res, next) => {
+const getClothingItems = (req, res, next) => {
   console.log("getting clothing items");
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch(() => next(new DefaultError("An error occurred on the server")));
+    .catch((err) => {
+      console.error(err);
+      return next(new DefaultError("An error occurred on the server"));
+    });
 };
 
 const deleteClothingItems = (req, res, next) => {
@@ -72,6 +75,7 @@ const putLikeItem = (req, res, next) => {
     .orFail()
     .then((item) => res.status(201).send(item))
     .catch((err) => {
+      console.error(err);
       if (err.name === "CastError") {
         return next(new BadRequestError("Invalid data provided"));
       }
