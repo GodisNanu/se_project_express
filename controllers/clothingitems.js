@@ -14,9 +14,9 @@ const createClothingItem = (req, res, next) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        next(new BadRequestError("Invalid data provided"));
+        return next(new BadRequestError("Invalid data provided"));
       } else {
-        next(err);
+        return next(err);
       }
     });
 };
@@ -40,7 +40,9 @@ const deleteClothingItems = (req, res, next) => {
     .orFail()
     .then((item) => {
       if (item.owner.toString() !== req.user._id.toString()) {
-        next(new ForbiddenError("You are not authorized to delete this item"));
+        return next(
+          new ForbiddenError("You are not authorized to delete this item")
+        );
       }
       return ClothingItem.findByIdAndDelete(itemId).then((deletedItem) =>
         res.status(200).send(deletedItem)
@@ -49,15 +51,15 @@ const deleteClothingItems = (req, res, next) => {
     .catch((err) => {
       console.error("Item deletion error", err);
       if (err.name === "ForbiddenError") {
-        next(new ForbiddenError("User not authorized"));
+        return next(new ForbiddenError("User not authorized"));
       }
       if (err.name === "CastError") {
-        next(new BadRequestError("Invalid data provided"));
+        return next(new BadRequestError("Invalid data provided"));
       }
       if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError("Id provided was not found"));
+        return next(new NotFoundError("Id provided was not found"));
       } else {
-        next(err);
+        return next(err);
       }
     });
 };
@@ -73,12 +75,12 @@ const putLikeItem = (req, res, next) => {
     .then((item) => res.status(201).send(item))
     .catch((err) => {
       if (err.name === "CastError") {
-        next(new BadRequestError("Invalid data provided"));
+        return next(new BadRequestError("Invalid data provided"));
       }
       if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError("Id provided was not found"));
+        return next(new NotFoundError("Id provided was not found"));
       } else {
-        next(err);
+        return next(err);
       }
     });
 };
@@ -95,12 +97,12 @@ const deleteLikeItem = (req, res, next) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        next(new BadRequestError("Invalid data provided"));
+        return next(new BadRequestError("Invalid data provided"));
       }
       if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError("Id provided was not found"));
+        return next(new NotFoundError("Id provided was not found"));
       } else {
-        next(err);
+        return next(err);
       }
     });
 };

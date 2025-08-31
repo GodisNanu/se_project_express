@@ -16,12 +16,12 @@ const getCurrentUser = (req, res, next) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "CastError") {
-        next(new BadRequestError("Invalid data provided"));
+        return next(new BadRequestError("Invalid data provided"));
       }
       if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError("Id provided was not found"));
+        return next(new NotFoundError("Id provided was not found"));
       } else {
-        next(err);
+        return next(err);
       }
     });
 };
@@ -30,30 +30,30 @@ const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
   console.log("createUser Controler ", name, avatar);
   if (!email || !password || !name || !avatar) {
-    next(new BadRequestError("Missing data"));
+    return next(new BadRequestError("Missing data"));
   }
-  return User.findOne({ email }).then((existingUser) => {
-    if (existingUser) {
-      next(new ConflictError("User already exists"));
-    }
-    return bcrypt
-      .hash(password, 10)
-      .then((hash) => User.create({ name, avatar, email, password: hash }))
-      .then((user) => {
-        User.findById(user._id)
-          .select("-password")
-          .then((userWithoutPassword) =>
-            res.status(201).send(userWithoutPassword)
-          );
-      })
-      .catch((err) => {
-        if (err.name === "ValidationError") {
-          next(new BadRequestError("Invalid data provided"));
-        } else {
-          next(err);
-        }
-      });
-  });
+  return User.findOne({ email })
+    .then((existingUser) => {
+      if (existingUser) {
+        return next(new ConflictError("User already exists"));
+      }
+      return bcrypt
+        .hash(password, 10)
+        .then((hash) => User.create({ name, avatar, email, password: hash }))
+        .then((user) => {
+          User.findById(user._id)
+            .select("-password")
+            .then((userWithoutPassword) =>
+              res.status(201).send(userWithoutPassword)
+            );
+        });
+    })
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return next(new BadRequestError("Invalid data provided"));
+      }
+      return next(err);
+    });
 };
 
 const login = (req, res, next) => {
