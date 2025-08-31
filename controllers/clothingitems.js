@@ -25,7 +25,7 @@ const getClothingItems = (req, res) => {
   console.log("getting clothing items");
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch((err) => next(new DefaultError("An error occurred on the server")));
+    .catch(() => next(new DefaultError("An error occurred on the server")));
 };
 
 const deleteClothingItems = (req, res) => {
