@@ -17,6 +17,6 @@ module.exports = (req, res, next) => {
     req.user = payload;
     return next();
   } catch (err) {
-    next(new UnauthorizedError("Authentication failed"));
+    return next(new UnauthorizedError("Authentication failed"));
   }
 };

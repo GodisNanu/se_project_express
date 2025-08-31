@@ -10,7 +10,7 @@ router.post("/signup", createUser);
 
 router.use("/users", auth, userRouter);
 router.use("/items", clothingItemRouter);
-router.use((req, res) => {
+router.use((req, res, next) => {
   next(new NotFoundError("Page not found"));
 });
 

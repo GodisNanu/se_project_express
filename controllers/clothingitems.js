@@ -5,7 +5,7 @@ const UnauthorizedError = require("../errors/unauthorized-err");
 const ForbiddenError = require("../errors/forbidden-err");
 const NotFoundError = require("../errors/not-found-err");
 
-const createClothingItem = (req, res) => {
+const createClothingItem = (req, res, next) => {
   console.log("creating Clothing Item");
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
@@ -21,14 +21,14 @@ const createClothingItem = (req, res) => {
     });
 };
 
-const getClothingItems = (req, res) => {
+const getClothingItems = (req, res, next) => {
   console.log("getting clothing items");
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
     .catch(() => next(new DefaultError("An error occurred on the server")));
 };
 
-const deleteClothingItems = (req, res) => {
+const deleteClothingItems = (req, res, next) => {
   const { itemId } = req.params;
   console.log("deleting Clothing Items");
 
