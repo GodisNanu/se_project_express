@@ -32,30 +32,28 @@ const createUser = (req, res, next) => {
   if (!email || !password || !name || !avatar) {
     next(new BadRequestError("Missing data"));
   }
-  return User.findOne({ email })
-    .then((existingUser) => {
-      if (existingUser) {
-        next(new ConflictError("User already exists"));
-      }
-      return bcrypt
-        .hash(password, 10)
-        .then((hash) => User.create({ name, avatar, email, password: hash }))
-        .then((user) => {
-          User.findById(user._id)
-            .select("-password")
-            .then((userWithoutPassword) =>
-              res.status(201).send(userWithoutPassword)
-            );
-        });
-    })
-
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(new BadRequestError("Invalid data provided"));
-      } else {
-        next();
-      }
-    });
+  return User.findOne({ email }).then((existingUser) => {
+    if (existingUser) {
+      next(new ConflictError("User already exists"));
+    }
+    return bcrypt
+      .hash(password, 10)
+      .then((hash) => User.create({ name, avatar, email, password: hash }))
+      .then((user) => {
+        User.findById(user._id)
+          .select("-password")
+          .then((userWithoutPassword) =>
+            res.status(201).send(userWithoutPassword)
+          );
+      })
+      .catch((err) => {
+        if (err.name === "ValidationError") {
+          next(new BadRequestError("Invalid data provided"));
+        } else {
+          next(err);
+        }
+      });
+  });
 };
 
 const login = (req, res, next) => {
