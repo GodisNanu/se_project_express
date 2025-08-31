@@ -7,7 +7,7 @@ const NotFoundError = require("../errors/not-found-err");
 const ConflictError = require("../errors/conflict-err");
 const UnauthorizedError = require("../errors/unauthorized-err");
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   console.log("getCurrentUser Controller");
 
   User.findById(req.user._id)
@@ -26,7 +26,7 @@ const getCurrentUser = (req, res) => {
     });
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
   console.log("createUser Controler ", name, avatar);
   if (!email || !password || !name || !avatar) {
@@ -58,7 +58,7 @@ const createUser = (req, res) => {
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   console.log("login controller", email, password);
@@ -90,7 +90,7 @@ const login = (req, res) => {
     });
 };
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const { name, avatar } = req.body;
   console.log("updateProfile controller", name, avatar);
   User.findByIdAndUpdate(

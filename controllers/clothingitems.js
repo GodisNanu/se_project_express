@@ -21,7 +21,7 @@ const createClothingItem = (req, res, next) => {
     });
 };
 
-const getClothingItems = (req, res, next) => {
+const getClothingItems = (res, next) => {
   console.log("getting clothing items");
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
@@ -62,7 +62,7 @@ const deleteClothingItems = (req, res, next) => {
     });
 };
 
-const putLikeItem = (req, res) => {
+const putLikeItem = (req, res, next) => {
   console.log("adding like");
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
@@ -83,7 +83,7 @@ const putLikeItem = (req, res) => {
     });
 };
 
-const deleteLikeItem = (req, res) => {
+const deleteLikeItem = (req, res, next) => {
   console.log("removing like");
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,

@@ -1,4 +1,4 @@
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, res) => {
   console.error(err);
   const statusCode = err.statusCode || 500;
   const message = err.message || "An error occurred on the server";
@@ -6,4 +6,4 @@ const errorHandler = (err, req, res, next) => {
   return res.status(statusCode).send({ message });
 };
 
-module.exports = {errorHandler};
+module.exports = { errorHandler };
