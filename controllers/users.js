@@ -35,7 +35,7 @@ const createUser = (req, res, next) => {
   return User.findOne({ email })
     .then((existingUser) => {
       if (existingUser) {
-        next(new ConflictError("User Already Exists"));
+        next(new ConflictError("User already exists"));
       }
       return bcrypt
         .hash(password, 10)
