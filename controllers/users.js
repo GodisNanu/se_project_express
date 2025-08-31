@@ -20,9 +20,8 @@ const getCurrentUser = (req, res, next) => {
       }
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("Id provided was not found"));
-      } else {
-        return next(err);
       }
+      return next(err);
     });
 };
 
@@ -62,13 +61,13 @@ const login = (req, res, next) => {
   console.log("login controller", email, password);
 
   if (!email || !password) {
-    next(new BadRequestError("Invalid data provided"));
+    return next(new BadRequestError("Invalid data provided"));
   }
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
-        next(new BadRequestError("Invalid data provided"));
+        return next(new BadRequestError("Invalid data provided"));
       }
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
@@ -78,13 +77,12 @@ const login = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        next(new BadRequestError("Invalid data provided"));
+        return next(new BadRequestError("Invalid data provided"));
       }
       if (err.name === "UnauthorizedError") {
-        next(new UnauthorizedError("Incorrect email and password"));
-      } else {
-        next(err);
+        return next(new UnauthorizedError("Incorrect email and password"));
       }
+      return next(err);
     });
 };
 
@@ -99,13 +97,12 @@ const updateProfile = (req, res, next) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === "ValidationError") {
-        next(new BadRequestError("Invalid data provided"));
+        return next(new BadRequestError("Invalid data provided"));
       }
       if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError("Id provided was not found"));
-      } else {
-        next(err);
+        return next(new NotFoundError("Id provided was not found"));
       }
+      return next(err);
     });
 };
 

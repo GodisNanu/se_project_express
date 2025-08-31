@@ -15,9 +15,8 @@ const createClothingItem = (req, res, next) => {
       console.error(err);
       if (err.name === "ValidationError") {
         return next(new BadRequestError("Invalid data provided"));
-      } else {
-        return next(err);
       }
+      return next(err);
     });
 };
 
@@ -58,9 +57,8 @@ const deleteClothingItems = (req, res, next) => {
       }
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("Id provided was not found"));
-      } else {
-        return next(err);
       }
+      return next(err);
     });
 };
 
@@ -79,9 +77,8 @@ const putLikeItem = (req, res, next) => {
       }
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("Id provided was not found"));
-      } else {
-        return next(err);
       }
+      return next(err);
     });
 };
 
@@ -101,9 +98,8 @@ const deleteLikeItem = (req, res, next) => {
       }
       if (err.name === "DocumentNotFoundError") {
         return next(new NotFoundError("Id provided was not found"));
-      } else {
-        return next(err);
       }
+      return next(err);
     });
 };
 
