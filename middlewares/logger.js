@@ -1,5 +1,5 @@
 const winston = require("winston");
-const expressWinston = require("espress-winston");
+const expressWinston = require("express-winston");
 
 const messageFormat = winston.format.combine(
   winston.format.timestamp(),
