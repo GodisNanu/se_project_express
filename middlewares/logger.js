@@ -1,5 +1,6 @@
 const winston = require("winston");
 const expressWinston = require("express-winston");
+const DailyRotateFile = require("winston-daily-rotate-file");
 
 const messageFormat = winston.format.combine(
   winston.format.timestamp(),
@@ -9,15 +10,18 @@ const messageFormat = winston.format.combine(
   )
 );
 
+const rotatingRequestTransport = new DailyRotateFile({
+  filename: "request-%DATE%.log",
+  datePattern: "YYYY-MM-DD",
+  maxSize: "20m",
+  maxFiles: "7d",
+  zippedArchive: true,
+});
+
 const requestLogger = expressWinston.logger({
   transports: [
-    new winston.transports.Console({
-      format: messageFormat,
-    }),
-    new winston.transports.File({
-      filename: "request.log",
-      format: winston.format.json(),
-    }),
+    new winston.transports.Console({ format: messageFormat }),
+    rotatingRequestTransport,
   ],
 });
 
